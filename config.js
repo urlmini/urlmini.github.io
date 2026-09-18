@@ -13,7 +13,7 @@ const SHORTS = {
   RANGE: "SHORTS!A:D",
   GO_URL: "https://urlmini.github.io",
   FORM: {
-    ACTION: "https://docs.google.com/forms/d/e/1r03FjjC_Jw4IH3n8I4_K5miPb6QiALPblCDDdjVrIA8/formResponse",
+    ACTION: "https://docs.google.com/forms/d/e/1FAIpQLSdGOvrH7mRsviL6U8H8qYS8cy9-sijgyLfR4fAg4i3vF8fdag/formResponse",
     FIELDS: {
                 code: "entry.1136799663",
                 url: "entry.314328174",
