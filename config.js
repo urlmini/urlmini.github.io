@@ -6,7 +6,7 @@ const SUPPORT_URL =
   "https://t.me/noWalletConnect";
 
 // Link shortener
-// Database SHORTS with headers: date | code | url | note
+// Database SHORTS with headers: date | code | url | user
 const SHORTS = {
   SHEET_ID: "1ZUUmPDQGseg5bGEagOeFy89akZRtFQAIm5MksrGOrtw",
   API_KEY: "AIzaSyCs8fSiITdfU4WyZRgKsWRlbhAKeJaVC0Q",
