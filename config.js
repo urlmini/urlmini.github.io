@@ -3,7 +3,7 @@
 // ===============================
 
 const SUPPORT_URL =
-  "https://t.me/noWalletConnect";
+   "https://t.me/SnappQuest/42";
 
 // Link shortener
 // Database SHORTS with headers: date | code | url | user

@@ -112,6 +112,21 @@
             border: 1px solid rgba(0,212,255,.25);
         }
         .hint { margin-top: 14px; color: var(--muted); font-size: .75rem; line-height: 1.5; }
+    .support {
+    margin-top: 16px;
+    text-align: center;
+    font-size: .8rem;
+}
+
+.support a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.support a:hover {
+    text-decoration: underline;
+}
     </style>
 </head>
 <body>
@@ -134,10 +149,16 @@
                 <button class="copy" type="button" onclick="copyShort()">Copy</button>
             </div>
             <p class="hint">Redirect format: this page with <strong>?c=CODE</strong>. Example: urlmini.github.io?c=nwc7k2</p>
+        
+        <p class="support">
+    <a href="https://t.me/SnappQuest/42" target="_blank" rel="noopener noreferrer">
+        Need help? Contact support →
+    </a>
+</p>
         </div>
         <div class="card" id="goCard" style="display:none;">
             <h1>Opening link…</h1>
-            <p class="sub" id="goStatus">Looking up this code in the database.</p>
+            <p class="sub" id="goStatus">Verifying your link, please wait.</p>
         </div>
     </div>
 
@@ -288,8 +309,8 @@
                 const links = parseLinks(await fetchRows());
                 const used = new Set(links.map(l => l.code));
                 if (code) {
-                    if (code.length < 3) throw new Error("Custom code must be at least 3 characters.");
-                    if (used.has(code)) throw new Error("That code is already taken.");
+                    if (code.length < 3) throw new Error("Custom link must be at least 3 characters.");
+                    if (used.has(code)) throw new Error("That link is already taken.");
                 } else {
                     do { code = randomCode(6); } while (used.has(code));
                 }
@@ -330,7 +351,7 @@
                 const links = parseLinks(await fetchRows());
                 const hit = links.find(l => l.code === normalizeCode(code));
                 if (!hit || !safeHttpUrl(hit.url)) {
-                    status.textContent = "This short code was not found.";
+                    status.textContent = "This short link was not found.";
                     return;
                 }
                 status.textContent = "Redirecting…";
