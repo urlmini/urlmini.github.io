@@ -127,6 +127,22 @@
 .support a:hover {
     text-decoration: underline;
 }
+.powered-by {
+    margin-top: 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: .75rem;
+}
+
+.powered-by a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.powered-by a:hover {
+    text-decoration: underline;
+}
     </style>
 </head>
 <body>
@@ -156,10 +172,20 @@
     </a>
 </p>
         </div>
+
         <div class="card" id="goCard" style="display:none;">
             <h1>Opening link…</h1>
             <p class="sub" id="goStatus">Verifying your link, please wait.</p>
         </div>
+
+        <p class="powered-by">
+    Powered by
+    <a href="https://niti.com.ng/" target="_blank" rel="noopener noreferrer">
+        Neroitech Inventions
+    </a>
+</p>
+
+
     </div>
 
     <script src="config.js"></script>
