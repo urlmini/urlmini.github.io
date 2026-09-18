@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create short URL links. Paste a long URL and get a short link. Duplicate codes are blocked.">
+    <title>URL Mini - Link shortener</title>
+    <link rel="icon" type="image/jpeg" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00d4ff;
+            --secondary: #7c3aed;
+            --bg: #0f1419;
+            --card: #1a1f2e;
+            --border: rgba(148, 163, 184, 0.12);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            color: var(--text);
+            background: linear-gradient(135deg, var(--bg), #1a2847);
+            padding: 28px 16px;
+        }
+        .wrap { max-width: 520px; margin: 40px auto; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 26px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+        }
+        h1 {
+            font-size: 1.7rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sub { color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+        label {
+            display: block;
+            font-size: .72rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            margin-bottom: 14px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: rgba(30,41,59,.8);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg);
+        }
+        button:disabled { opacity: .55; cursor: not-allowed; }
+        .error, .ok {
+            display: none;
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: .9rem;
+        }
+        .error { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #fca5a5; }
+        .ok { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.3); color: #86efac; }
+        .error.show, .ok.show { display: block; }
+        .result {
+            display: none;
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(0,212,255,.06);
+            border: 1px solid rgba(0,212,255,.25);
+        }
+        .result.show { display: block; }
+        .result code {
+            display: block;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .78rem;
+            word-break: break-all;
+            margin: 8px 0 12px;
+        }
+        .copy {
+            width: auto;
+            padding: 10px 14px;
+            background: rgba(0,212,255,.1);
+            color: var(--primary);
+            border: 1px solid rgba(0,212,255,.25);
+        }
+        .hint { margin-top: 14px; color: var(--muted); font-size: .75rem; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card" id="createCard">
+            <h1>Short link</h1>
+            <p class="sub">Paste a long URL. You get a short code.</p>
+            <div class="error" id="error"></div>
+            <div class="ok" id="ok"></div>
+            <label for="longUrl">Destination URL</label>
+            <input id="longUrl" type="url" placeholder="urlmini.github.io" spellcheck="false">
+            <label for="customCode">Custom code (optional)</label>
+            <input id="customCode" type="text" maxlength="24" placeholder="leave blank to auto-generate" spellcheck="false">
+            <label for="userName">User</label>
+            <input id="userName" type="text" maxlength="80" placeholder="who created this link" spellcheck="false">
+            <button type="button" id="makeBtn" onclick="createLink()">Create short link</button>
+            <div class="result" id="result">
+                <label>Your short link</label>
+                <code id="shortOut"></code>
+                <button class="copy" type="button" onclick="copyShort()">Copy</button>
+            </div>
+            <p class="hint">Redirect format: this page with <strong>?c=CODE</strong>. Example: urlmini.github.io?c=nwc7k2</p>
+        </div>
+        <div class="card" id="goCard" style="display:none;">
+            <h1>Opening link…</h1>
+            <p class="sub" id="goStatus">Looking up this code in the database.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+
+    <script>
+
+        const CONFIG = {
+            SHEET_ID: SHORTS.SHEET_ID,
+            RANGE: SHORTS.RANGE,
+            API_KEY: SHORTS.API_KEY,
+            FORM_ACTION: SHORTS.FORM.ACTION,
+            FIELDS: SHORTS.FORM.FIELDS
+        };
+        const ALPHABET = "abcdefghijkmnopqrstuvwxyz23456789";
+
+        function show(id, text) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = text;
+            el.classList.add("show");
+            setTimeout(() => el.classList.remove("show"), 5000);
+        }
+
+        function safeHttpUrl(value) {
+            let raw = String(value || "").trim();
+            if (!raw) return "";
+            if (!/^https?:\/\//i.test(raw)) raw = "https://" + raw;
+            try {
+                const url = new URL(raw);
+                if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+                return url.toString();
+            } catch {
+                return "";
+            }
+        }
+
+        function normalizeCode(value) {
+            return String(value || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+        }
+
+        function randomCode(len) {
+            let out = "";
+            const bytes = new Uint8Array(len);
+            crypto.getRandomValues(bytes);
+            for (let i = 0; i < len; i++) out += ALPHABET[bytes[i] % ALPHABET.length];
+            return out;
+        }
+
+        function shortPageUrl(code) {
+            const url = new URL(location.href);
+            url.search = "";
+            url.hash = "";
+            url.searchParams.set("c", code);
+            return url.toString();
+        }
+
+        async function fetchRows() {
+            const url =
+                "https://sheets.googleapis.com/v4/spreadsheets/" +
+                CONFIG.SHEET_ID +
+                "/values/" + encodeURIComponent(CONFIG.RANGE) +
+                "?key=" + CONFIG.API_KEY;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error?.message || "Could not read sheet");
+            return data.values || [];
+        }
+
+        function parseLinks(values) {
+            if (!values.length) return [];
+            const header = (values[0] || []).map(v => String(v || "").trim().toLowerCase());
+            let codeIdx = header.findIndex(h => h === "code" || h.includes("code"));
+            let urlIdx = header.findIndex(h => h === "url" || h.includes("url") || h.includes("link"));
+            const start = (codeIdx >= 0 && urlIdx >= 0) ? 1 : 0;
+            if (codeIdx < 0 || urlIdx < 0) {
+                if ((values[0] || []).length >= 3) { codeIdx = 1; urlIdx = 2; }
+                else { codeIdx = 0; urlIdx = 1; }
+            }
+            return values.slice(start).map(row => ({
+                code: normalizeCode(row[codeIdx]),
+                url: String(row[urlIdx] || "").trim()
+            })).filter(r => r.code && r.url);
+        }
+
+        function submitForm(code, dest, user) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const iframeName = "short_gform_" + Date.now();
+                    const iframe = document.createElement("iframe");
+                    iframe.name = iframeName;
+                    iframe.style.display = "none";
+                    document.body.appendChild(iframe);
+
+                    const form = document.createElement("form");
+                    form.method = "POST";
+                    form.action = CONFIG.FORM_ACTION;
+                    form.target = iframeName;
+                    form.acceptCharset = "UTF-8";
+                    form.style.display = "none";
+
+                    const fields = {
+                        [CONFIG.FIELDS.code]: code,
+                        [CONFIG.FIELDS.url]: dest,
+                        [CONFIG.FIELDS.user]: user,
+                        fvv: "1",
+                        pageHistory: "0"
+                    };
+                    Object.keys(fields).forEach(name => {
+                        const input = document.createElement("input");
+                        input.type = "hidden";
+                        input.name = name;
+                        input.value = fields[name];
+                        form.appendChild(input);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    setTimeout(() => {
+                        form.remove();
+                        iframe.remove();
+                        resolve();
+                    }, 2200);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        async function createLink() {
+            const dest = safeHttpUrl(document.getElementById("longUrl").value);
+            let code = normalizeCode(document.getElementById("customCode").value);
+            const user = String((document.getElementById("userName") || {}).value || "").trim();
+            const btn = document.getElementById("makeBtn");
+
+            if (CONFIG.API_KEY.indexOf("PASTE_") === 0 || CONFIG.FORM_ACTION.indexOf("PASTE_") !== -1) {
+                show("error", "Add your Sheets API key and Google Form action URL in the CONFIG block.");
+                return;
+            }
+            if (!dest) {
+                show("error", "Enter a valid http or https URL.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Checking database...";
+            try {
+                const links = parseLinks(await fetchRows());
+                const used = new Set(links.map(l => l.code));
+                if (code) {
+                    if (code.length < 3) throw new Error("Custom code must be at least 3 characters.");
+                    if (used.has(code)) throw new Error("That code is already taken.");
+                } else {
+                    do { code = randomCode(6); } while (used.has(code));
+                }
+
+                btn.textContent = "Saving...";
+                await submitForm(code, dest, user);
+
+                btn.textContent = "Waiting for database...";
+                let found = false;
+                for (let i = 0; i < 8; i++) {
+                    await new Promise(r => setTimeout(r, 1400));
+                    const latest = parseLinks(await fetchRows());
+                    if (latest.some(l => l.code === code)) { found = true; break; }
+                }
+
+                const shortUrl = shortPageUrl(code);
+                document.getElementById("shortOut").textContent = shortUrl;
+                document.getElementById("result").classList.add("show");
+                show("ok", found ? "Short link ready." : "Submitted. If the link 404s for a few seconds, wait and try again.");
+            } catch (err) {
+                show("error", err.message || "Could not create the link.");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Create short link";
+            }
+        }
+
+        function copyShort() {
+            const text = document.getElementById("shortOut").textContent;
+            navigator.clipboard.writeText(text).then(() => show("ok", "Copied"));
+        }
+
+        async function openCode(code) {
+            document.getElementById("createCard").style.display = "none";
+            document.getElementById("goCard").style.display = "block";
+            const status = document.getElementById("goStatus");
+            try {
+                const links = parseLinks(await fetchRows());
+                const hit = links.find(l => l.code === normalizeCode(code));
+                if (!hit || !safeHttpUrl(hit.url)) {
+                    status.textContent = "This short code was not found.";
+                    return;
+                }
+                status.textContent = "Redirecting…";
+                window.location.replace(hit.url);
+            } catch (err) {
+                status.textContent = err.message || "Could not look up this link.";
+            }
+        }
+
+        const incoming = new URLSearchParams(location.search).get("c") || location.hash.replace(/^#/, "");
+        if (incoming) openCode(incoming);
+    </script>
+</body>
+</html>
