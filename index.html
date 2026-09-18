@@ -350,10 +350,15 @@
             try {
                 const links = parseLinks(await fetchRows());
                 const hit = links.find(l => l.code === normalizeCode(code));
-                if (!hit || !safeHttpUrl(hit.url)) {
-                    status.textContent = "This short link was not found.";
-                    return;
-                }
+if (!hit || !safeHttpUrl(hit.url)) {
+    status.innerHTML = `
+        This short link was not found.<br>
+        <a href="https://urlmini.github.io/" class="reload-link">
+            ↻ Reload page
+        </a>
+    `;
+    return;
+}
                 status.textContent = "Redirecting…";
                 window.location.replace(hit.url);
             } catch (err) {
