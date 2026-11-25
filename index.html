@@ -1,457 +1,633 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Create short URL links. Paste a long URL and get a short link. Duplicate codes are blocked.">
-    <title>URL Mini - Link shortener</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QM106YDX6N"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create short URL links. Paste a long URL and get a short link. Duplicate codes are blocked.">
+  <title>URL Mini - Link shortener</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QM106YDX6N"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-QM106YDX6N');
   </script>
-    <link rel="icon" type="image/jpeg" href="favicon.ico">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary: #00d4ff;
-            --secondary: #7c3aed;
-            --bg: #0f1419;
-            --card: #1a1f2e;
-            --border: rgba(148, 163, 184, 0.12);
-            --text: #f1f5f9;
-            --muted: #94a3b8;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            color: var(--text);
-            background: linear-gradient(135deg, var(--bg), #1a2847);
-            padding: 28px 16px;
-        }
-        .wrap { max-width: 520px; margin: 40px auto; }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px 26px;
-            box-shadow: 0 20px 60px rgba(0,0,0,.45);
-        }
-        h1 {
-            font-size: 1.7rem;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .sub { color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
-        label {
-            display: block;
-            font-size: .72rem;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            color: var(--muted);
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        input {
-            width: 100%;
-            padding: 13px 14px;
-            margin-bottom: 14px;
-            border-radius: 12px;
-            border: 2px solid var(--border);
-            background: rgba(30,41,59,.8);
-            color: var(--text);
-            font-size: 1rem;
-            font-family: inherit;
-        }
-        input:focus { outline: none; border-color: var(--primary); }
-        button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: inherit;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--bg);
-        }
-        button:disabled { opacity: .55; cursor: not-allowed; }
-        .error, .ok {
-            display: none;
-            margin-bottom: 14px;
-            padding: 12px 14px;
-            border-radius: 10px;
-            font-size: .9rem;
-        }
-        .error { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #fca5a5; }
-        .ok { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.3); color: #86efac; }
-        .error.show, .ok.show { display: block; }
-        .result {
-            display: none;
-            margin-top: 18px;
-            padding: 14px;
-            border-radius: 12px;
-            background: rgba(0,212,255,.06);
-            border: 1px solid rgba(0,212,255,.25);
-        }
-        .result.show { display: block; }
-        .result code {
-            display: block;
-            color: var(--primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .78rem;
-            word-break: break-all;
-            margin: 8px 0 12px;
-        }
-        .copy {
-            width: auto;
-            padding: 10px 14px;
-            background: rgba(0,212,255,.1);
-            color: var(--primary);
-            border: 1px solid rgba(0,212,255,.25);
-        }
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #0f172a;
-            color: #f1f5f9;
-            padding: 14px 22px;
-            border-radius: 999px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            z-index: 1000;
-            opacity: 0;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        .toast svg { flex-shrink: 0; }
-    .support {
-    margin-top: 16px;
-    text-align: center;
-    font-size: .8rem;
-}
+  <link rel="icon" type="image/jpeg" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-.support a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-}
+    :root {
+      --primary: #22d3ee;
+      --primary-dim: rgba(34, 211, 238, 0.12);
+      --secondary: #a78bfa;
+      --bg: #07090f;
+      --bg-elevated: #0c1018;
+      --card: #111827;
+      --card-hover: #151c2c;
+      --border: rgba(148, 163, 184, 0.1);
+      --border-strong: rgba(148, 163, 184, 0.18);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --dim: #64748b;
+      --success: #34d399;
+      --error: #f87171;
+      --radius: 16px;
+      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
 
-.support a:hover {
-    text-decoration: underline;
-}
-.powered-by {
-    margin-top: 18px;
-    text-align: center;
-    color: var(--muted);
-    font-size: .75rem;
-}
+    html { height: 100%; }
 
-.powered-by a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-}
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 211, 238, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(167, 139, 250, 0.08), transparent);
+      padding: 32px 16px 48px;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-.powered-by a:hover {
-    text-decoration: underline;
-}
-    </style>
+    .wrap {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Brand */
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .brand-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 24px rgba(34, 211, 238, 0.25);
+    }
+    .brand-icon svg {
+      width: 26px;
+      height: 26px;
+      stroke: #07090f;
+      stroke-width: 2.2;
+    }
+    .brand h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #e0f2fe, var(--primary) 60%, var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .brand p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    /* Form */
+    .field {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-size: 0.98rem;
+      font-family: inherit;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    input::placeholder { color: var(--dim); }
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #0e1420;
+    }
+
+    /* Primary button */
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      margin-top: 6px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.98rem;
+      font-family: inherit;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #07090f;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      box-shadow: 0 4px 16px rgba(34, 211, 238, 0.25);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(34, 211, 238, 0.35);
+    }
+    .btn-primary:active:not(:disabled) { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Messages */
+    .msg {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border-radius: 11px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .msg.error {
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.25);
+      color: #fca5a5;
+    }
+    .msg.ok {
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      color: #6ee7b7;
+    }
+    .msg.show { display: block; }
+
+    /* Result */
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--primary-dim);
+      border: 1px solid rgba(34, 211, 238, 0.22);
+    }
+    .result.show { display: block; }
+    .result label {
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+    .result code {
+      display: block;
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 500;
+      word-break: break-all;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 9px;
+    }
+    .btn-copy {
+      width: auto;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      font-family: inherit;
+      cursor: pointer;
+      background: rgba(34, 211, 238, 0.12);
+      color: var(--primary);
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-copy:hover {
+      background: rgba(34, 211, 238, 0.2);
+    }
+    .btn-copy.copied {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--success);
+      border-color: rgba(52, 211, 153, 0.35);
+    }
+
+    /* Hint */
+    .hint {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--dim);
+      line-height: 1.5;
+      text-align: center;
+    }
+    .hint strong { color: var(--muted); font-weight: 600; }
+
+    /* Support + powered */
+    .footer-links {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 0.82rem;
+    }
+    .footer-links a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-links a:hover { text-decoration: underline; }
+
+    .powered {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--dim);
+      font-size: 0.75rem;
+    }
+    .powered a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .powered a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    /* Go / redirect card */
+    #goCard {
+      text-align: center;
+      padding: 40px 28px;
+    }
+    #goCard h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+    #goCard .sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+    #goCard a {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    #goCard a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      background: #0f172a;
+      color: #f1f5f9;
+      padding: 13px 22px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-strong);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast svg { flex-shrink: 0; }
+
+    @media (max-width: 420px) {
+      body { padding: 24px 12px 40px; }
+      .card { padding: 24px 18px; }
+      .brand h1 { font-size: 1.45rem; }
+    }
+  </style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="card" id="createCard">
-            <h1>URL Mini</h1>
-            <p class="sub">Paste a long URL. You get a short custom link.</p>
-            <div class="error" id="error"></div>
-            <div class="ok" id="ok"></div>
-            <label for="longUrl">Destination URL</label>
-            <input id="longUrl" type="url" placeholder="urlmini.github.io" spellcheck="false">
-            <label for="customCode">Custom code (optional)</label>
-            <input id="customCode" type="text" maxlength="24" placeholder="leave blank to auto-generate" spellcheck="false">
-            <label for="userName">User</label>
-            <input id="userName" type="text" maxlength="80" placeholder="who created this link" spellcheck="false">
-            <button type="button" id="makeBtn" onclick="createLink()">Create short link</button>
-            <div class="result" id="result">
-                <label>Your short link</label>
-                <code id="shortOut"></code>
-                <button class="copy" type="button" onclick="copyShort()">Copy</button>
-            </div>
-            <p class="hint">Redirect format: this page with <strong>?c=CODE</strong>. Example: urlmini.github.io?c=nwc7k2</p>
-        
-        <p class="support">
-    <a href="https://t.me/SnappQuest/42" target="_blank" rel="noopener noreferrer">
-        Need help? Contact support →
-    </a>
-</p>
+  <div class="wrap">
+    <!-- Create card -->
+    <div id="createCard">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </div>
+        <h1>URL Mini</h1>
+        <p>Paste a long URL. Get a clean short link.</p>
+      </div>
+
+      <div class="card">
+        <div class="msg error" id="error"></div>
+        <div class="msg ok" id="ok"></div>
+
+        <div class="field">
+          <label for="longUrl">Destination URL</label>
+          <input id="longUrl" type="url" placeholder="https://example.com/very/long/path" spellcheck="false" autocomplete="off">
         </div>
 
-        <div class="card" id="goCard" style="display:none;">
-            <h1>Opening link…</h1>
-            <p class="sub" id="goStatus">Verifying your link, please wait.</p>
+        <div class="field">
+          <label for="customCode">Custom code <span style="text-transform:none;font-weight:500;color:var(--dim);">(optional)</span></label>
+          <input id="customCode" type="text" maxlength="24" placeholder="leave blank to auto-generate" spellcheck="false" autocomplete="off">
         </div>
 
-        <p class="powered-by">
-    Powered by
-    <a href="https://niti.com.ng/" target="_blank" rel="noopener noreferrer">
-        Neroitech Inventions
-    </a>
-</p>
+        <div class="field">
+          <label for="userName">Created by</label>
+          <input id="userName" type="text" maxlength="80" placeholder="your name or handle" spellcheck="false" autocomplete="off">
+        </div>
 
+        <button type="button" class="btn-primary" id="makeBtn" onclick="createLink()">Create short link</button>
+
+        <div class="result" id="result">
+          <label>Your short link</label>
+          <code id="shortOut"></code>
+          <button class="btn-copy" type="button" onclick="copyShort()">Copy link</button>
+        </div>
+
+        <p class="hint">
+          Redirect format: this page with <strong>?c=CODE</strong><br>
+          Example: urlmini.github.io?c=nwc7k2
+        </p>
+      </div>
+
+      <p class="footer-links">
+        <a href="https://t.me/SnappQuest/42" target="_blank" rel="noopener noreferrer">Need help? Contact support →</a>
+      </p>
     </div>
 
-    <div class="toast" id="toast">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        <span id="toastText">Copied!</span>
+    <!-- Redirect card -->
+    <div class="card" id="goCard" style="display:none;">
+      <h1>Opening link…</h1>
+      <p class="sub" id="goStatus">Verifying your link, please wait.</p>
     </div>
 
-    <script src="config.js"></script>
+    <p class="powered">
+      Powered by
+      <a href="https://niti.com.ng/" target="_blank" rel="noopener noreferrer">Neroitech Inventions</a>
+    </p>
+  </div>
 
-    <script>
+  <div class="toast" id="toast">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastText">Copied!</span>
+  </div>
 
-        const CONFIG = {
-            SHEET_ID: SHORTS.SHEET_ID,
-            RANGE: SHORTS.RANGE,
-            API_KEY: SHORTS.API_KEY,
-            FORM_ACTION: SHORTS.FORM.ACTION,
-            FIELDS: SHORTS.FORM.FIELDS
-        };
-        const ALPHABET = "abcdefghijkmnopqrstuvwxyz23456789";
+  <script src="config.js"></script>
+  <script>
+    const CONFIG = {
+      SHEET_ID: SHORTS.SHEET_ID,
+      RANGE: SHORTS.RANGE,
+      API_KEY: SHORTS.API_KEY,
+      FORM_ACTION: SHORTS.FORM.ACTION,
+      FIELDS: SHORTS.FORM.FIELDS
+    };
+    const ALPHABET = "abcdefghijkmnopqrstuvwxyz23456789";
 
-        function show(id, text) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.textContent = text;
-            el.classList.add("show");
-            setTimeout(() => el.classList.remove("show"), 5000);
+    function show(id, text) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 5000);
+    }
+
+    function safeHttpUrl(value) {
+      let raw = String(value || "").trim();
+      if (!raw) return "";
+      if (!/^https?:\/\//i.test(raw)) raw = "https://" + raw;
+      try {
+        const url = new URL(raw);
+        if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+        return url.toString();
+      } catch {
+        return "";
+      }
+    }
+
+    function normalizeCode(value) {
+      return String(value || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    }
+
+    function randomCode(len) {
+      let out = "";
+      const bytes = new Uint8Array(len);
+      crypto.getRandomValues(bytes);
+      for (let i = 0; i < len; i++) out += ALPHABET[bytes[i] % ALPHABET.length];
+      return out;
+    }
+
+    function shortPageUrl(code) {
+      const url = new URL(location.href);
+      url.search = "";
+      url.hash = "";
+      url.searchParams.set("c", code);
+      return url.toString();
+    }
+
+    async function fetchRows() {
+      const url =
+        "https://sheets.googleapis.com/v4/spreadsheets/" +
+        CONFIG.SHEET_ID +
+        "/values/" + encodeURIComponent(CONFIG.RANGE) +
+        "?key=" + CONFIG.API_KEY;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || "Could not read sheet");
+      return data.values || [];
+    }
+
+    function parseLinks(values) {
+      if (!values.length) return [];
+      const header = (values[0] || []).map(v => String(v || "").trim().toLowerCase());
+      let codeIdx = header.findIndex(h => h === "code" || h.includes("code"));
+      let urlIdx = header.findIndex(h => h === "url" || h.includes("url") || h.includes("link"));
+      const start = (codeIdx >= 0 && urlIdx >= 0) ? 1 : 0;
+      if (codeIdx < 0 || urlIdx < 0) {
+        if ((values[0] || []).length >= 3) { codeIdx = 1; urlIdx = 2; }
+        else { codeIdx = 0; urlIdx = 1; }
+      }
+      return values.slice(start).map(row => ({
+        code: normalizeCode(row[codeIdx]),
+        url: String(row[urlIdx] || "").trim()
+      })).filter(r => r.code && r.url);
+    }
+
+    function submitForm(code, dest, user) {
+      return new Promise((resolve, reject) => {
+        try {
+          const iframeName = "short_gform_" + Date.now();
+          const iframe = document.createElement("iframe");
+          iframe.name = iframeName;
+          iframe.style.display = "none";
+          document.body.appendChild(iframe);
+
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = CONFIG.FORM_ACTION;
+          form.target = iframeName;
+          form.acceptCharset = "UTF-8";
+          form.style.display = "none";
+
+          const fields = {
+            [CONFIG.FIELDS.code]: code,
+            [CONFIG.FIELDS.url]: dest,
+            [CONFIG.FIELDS.user]: user,
+            fvv: "1",
+            pageHistory: "0"
+          };
+          Object.keys(fields).forEach(name => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = name;
+            input.value = fields[name];
+            form.appendChild(input);
+          });
+
+          document.body.appendChild(form);
+          form.submit();
+          setTimeout(() => {
+            form.remove();
+            iframe.remove();
+            resolve();
+          }, 2200);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    async function createLink() {
+      const dest = safeHttpUrl(document.getElementById("longUrl").value);
+      let code = normalizeCode(document.getElementById("customCode").value);
+      const user = String((document.getElementById("userName") || {}).value || "").trim();
+      const btn = document.getElementById("makeBtn");
+
+      if (CONFIG.API_KEY.indexOf("PASTE_") === 0 || CONFIG.FORM_ACTION.indexOf("PASTE_") !== -1) {
+        show("error", "Add your Sheets API key and Google Form action URL in the CONFIG block.");
+        return;
+      }
+      if (!dest) {
+        show("error", "Enter a valid http or https URL.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Checking database…";
+      try {
+        const links = parseLinks(await fetchRows());
+        const used = new Set(links.map(l => l.code));
+        if (code) {
+          if (code.length < 3) throw new Error("Custom link must be at least 3 characters.");
+          if (used.has(code)) throw new Error("That link is already taken.");
+        } else {
+          do { code = randomCode(6); } while (used.has(code));
         }
 
-        function safeHttpUrl(value) {
-            let raw = String(value || "").trim();
-            if (!raw) return "";
-            if (!/^https?:\/\//i.test(raw)) raw = "https://" + raw;
-            try {
-                const url = new URL(raw);
-                if (url.protocol !== "http:" && url.protocol !== "https:") return "";
-                return url.toString();
-            } catch {
-                return "";
-            }
+        btn.textContent = "Saving…";
+        await submitForm(code, dest, user);
+
+        btn.textContent = "Waiting for database…";
+        let found = false;
+        for (let i = 0; i < 8; i++) {
+          await new Promise(r => setTimeout(r, 1400));
+          const latest = parseLinks(await fetchRows());
+          if (latest.some(l => l.code === code)) { found = true; break; }
         }
 
-        function normalizeCode(value) {
-            return String(value || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+        const shortUrl = shortPageUrl(code);
+        document.getElementById("shortOut").textContent = shortUrl;
+        document.getElementById("result").classList.add("show");
+        show("ok", found ? "Short link ready." : "Submitted. If the link 404s for a few seconds, wait and try again.");
+      } catch (err) {
+        show("error", err.message || "Could not create the link.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Create short link";
+      }
+    }
+
+    function copyShort() {
+      const text = document.getElementById("shortOut").textContent;
+      const btn = document.querySelector(".btn-copy");
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.textContent;
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        showToast("Link copied to clipboard");
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove("copied");
+        }, 1800);
+      }).catch(() => showToast("Could not copy"));
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastText").textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    async function openCode(code) {
+      document.getElementById("createCard").style.display = "none";
+      document.getElementById("goCard").style.display = "block";
+      const status = document.getElementById("goStatus");
+      try {
+        const links = parseLinks(await fetchRows());
+        const hit = links.find(l => l.code === normalizeCode(code));
+        if (!hit || !safeHttpUrl(hit.url)) {
+          status.innerHTML = `
+            This short link was not found.<br>
+            <a href="https://urlmini.github.io/">↻ Reload page</a>
+          `;
+          return;
         }
+        status.textContent = "Redirecting…";
+        window.location.replace(hit.url);
+      } catch (err) {
+        status.textContent = err.message || "Could not look up this link.";
+      }
+    }
 
-        function randomCode(len) {
-            let out = "";
-            const bytes = new Uint8Array(len);
-            crypto.getRandomValues(bytes);
-            for (let i = 0; i < len; i++) out += ALPHABET[bytes[i] % ALPHABET.length];
-            return out;
-        }
-
-        function shortPageUrl(code) {
-            const url = new URL(location.href);
-            url.search = "";
-            url.hash = "";
-            url.searchParams.set("c", code);
-            return url.toString();
-        }
-
-        async function fetchRows() {
-            const url =
-                "https://sheets.googleapis.com/v4/spreadsheets/" +
-                CONFIG.SHEET_ID +
-                "/values/" + encodeURIComponent(CONFIG.RANGE) +
-                "?key=" + CONFIG.API_KEY;
-            const res = await fetch(url);
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error?.message || "Could not read sheet");
-            return data.values || [];
-        }
-
-        function parseLinks(values) {
-            if (!values.length) return [];
-            const header = (values[0] || []).map(v => String(v || "").trim().toLowerCase());
-            let codeIdx = header.findIndex(h => h === "code" || h.includes("code"));
-            let urlIdx = header.findIndex(h => h === "url" || h.includes("url") || h.includes("link"));
-            const start = (codeIdx >= 0 && urlIdx >= 0) ? 1 : 0;
-            if (codeIdx < 0 || urlIdx < 0) {
-                if ((values[0] || []).length >= 3) { codeIdx = 1; urlIdx = 2; }
-                else { codeIdx = 0; urlIdx = 1; }
-            }
-            return values.slice(start).map(row => ({
-                code: normalizeCode(row[codeIdx]),
-                url: String(row[urlIdx] || "").trim()
-            })).filter(r => r.code && r.url);
-        }
-
-        function submitForm(code, dest, user) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const iframeName = "short_gform_" + Date.now();
-                    const iframe = document.createElement("iframe");
-                    iframe.name = iframeName;
-                    iframe.style.display = "none";
-                    document.body.appendChild(iframe);
-
-                    const form = document.createElement("form");
-                    form.method = "POST";
-                    form.action = CONFIG.FORM_ACTION;
-                    form.target = iframeName;
-                    form.acceptCharset = "UTF-8";
-                    form.style.display = "none";
-
-                    const fields = {
-                        [CONFIG.FIELDS.code]: code,
-                        [CONFIG.FIELDS.url]: dest,
-                        [CONFIG.FIELDS.user]: user,
-                        fvv: "1",
-                        pageHistory: "0"
-                    };
-                    Object.keys(fields).forEach(name => {
-                        const input = document.createElement("input");
-                        input.type = "hidden";
-                        input.name = name;
-                        input.value = fields[name];
-                        form.appendChild(input);
-                    });
-
-                    document.body.appendChild(form);
-                    form.submit();
-                    setTimeout(() => {
-                        form.remove();
-                        iframe.remove();
-                        resolve();
-                    }, 2200);
-                } catch (err) {
-                    reject(err);
-                }
-            });
-        }
-
-        async function createLink() {
-            const dest = safeHttpUrl(document.getElementById("longUrl").value);
-            let code = normalizeCode(document.getElementById("customCode").value);
-            const user = String((document.getElementById("userName") || {}).value || "").trim();
-            const btn = document.getElementById("makeBtn");
-
-            if (CONFIG.API_KEY.indexOf("PASTE_") === 0 || CONFIG.FORM_ACTION.indexOf("PASTE_") !== -1) {
-                show("error", "Add your Sheets API key and Google Form action URL in the CONFIG block.");
-                return;
-            }
-            if (!dest) {
-                show("error", "Enter a valid http or https URL.");
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = "Checking database...";
-            try {
-                const links = parseLinks(await fetchRows());
-                const used = new Set(links.map(l => l.code));
-                if (code) {
-                    if (code.length < 3) throw new Error("Custom link must be at least 3 characters.");
-                    if (used.has(code)) throw new Error("That link is already taken.");
-                } else {
-                    do { code = randomCode(6); } while (used.has(code));
-                }
-
-                btn.textContent = "Saving...";
-                await submitForm(code, dest, user);
-
-                btn.textContent = "Waiting for database...";
-                let found = false;
-                for (let i = 0; i < 8; i++) {
-                    await new Promise(r => setTimeout(r, 1400));
-                    const latest = parseLinks(await fetchRows());
-                    if (latest.some(l => l.code === code)) { found = true; break; }
-                }
-
-                const shortUrl = shortPageUrl(code);
-                document.getElementById("shortOut").textContent = shortUrl;
-                document.getElementById("result").classList.add("show");
-                show("ok", found ? "Short link ready." : "Submitted. If the link 404s for a few seconds, wait and try again.");
-            } catch (err) {
-                show("error", err.message || "Could not create the link.");
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Create short link";
-            }
-        }
-
-        function copyShort() {
-            const text = document.getElementById("shortOut").textContent;
-            const btn = document.querySelector(".copy");
-            navigator.clipboard.writeText(text).then(() => {
-                const original = btn.textContent;
-                btn.textContent = "Copied!";
-                btn.style.background = "rgba(34,197,94,0.15)";
-                btn.style.color = "#22c55e";
-                btn.style.borderColor = "rgba(34,197,94,0.4)";
-                showToast("Link copied to clipboard");
-                setTimeout(() => {
-                    btn.textContent = original;
-                    btn.style.background = "";
-                    btn.style.color = "";
-                    btn.style.borderColor = "";
-                }, 1800);
-            }).catch(() => showToast("Could not copy"));
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById("toast");
-            document.getElementById("toastText").textContent = message;
-            toast.classList.add("show");
-            setTimeout(() => toast.classList.remove("show"), 2200);
-        }
-
-        async function openCode(code) {
-            document.getElementById("createCard").style.display = "none";
-            document.getElementById("goCard").style.display = "block";
-            const status = document.getElementById("goStatus");
-            try {
-                const links = parseLinks(await fetchRows());
-                const hit = links.find(l => l.code === normalizeCode(code));
-if (!hit || !safeHttpUrl(hit.url)) {
-    status.innerHTML = `
-        This short link was not found.<br>
-        <a href="https://urlmini.github.io/" class="reload-link">
-            ↻ Reload page
-        </a>
-    `;
-    return;
-}
-                status.textContent = "Redirecting…";
-                window.location.replace(hit.url);
-            } catch (err) {
-                status.textContent = err.message || "Could not look up this link.";
-            }
-        }
-
-        const incoming = new URLSearchParams(location.search).get("c") || location.hash.replace(/^#/, "");
-        if (incoming) openCode(incoming);
-    </script>
+    const incoming = new URLSearchParams(location.search).get("c") || location.hash.replace(/^#/, "");
+    if (incoming) openCode(incoming);
+  </script>
 </body>
 </html>
